@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطة قراءة العهد القديم اليومية</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            50: '#fffdf0',
+                            100: '#fefab8',
+                            400: '#fbbf24',
+                            500: '#d97706',
+                            600: '#b45309',
+                            700: '#92400e',
+                        },
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Tajawal', 'Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts: Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #d97706 0%, #78350f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .dark .gold-gradient-text {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-navy-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-navy-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-2xl gold-gradient flex items-center justify-center text-white shadow-md shadow-amber-500/20 shrink-0">
+                    <i class="fa-solid fa-book-bible text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white leading-tight">خطة قراءة العهد القديم</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">إصحاحين يومياً مع تتبع الإنجاز والملاحظات</p>
+                </div>
+            </div>
+
+            <!-- Top Header Controls -->
+            <div class="flex items-center space-x-2 sm:space-x-3 space-x-reverse">
+                <!-- Export Backup -->
+                <button onclick="exportData()" title="تصدير نسخة احتياطية" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                
+                <!-- Import Backup -->
+                <button onclick="triggerImport()" title="استيراد نسخة احتياطية" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-upload"></i>
+                </button>
+                <input type="file" id="importFileInput" onchange="importData(event)" class="hidden" accept=".json">
+
+                <!-- Deuterocanonical Toggle Button -->
+                <button id="toggleDeuteroBtn" onclick="toggleDeuterocanonical()" class="px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center space-x-1.5 space-x-reverse">
+                    <i class="fa-solid fa-layer-group text-amber-500"></i>
+                    <span id="deuteroStatusText">الأسفار الثانية: مفعّلة</span>
+                </button>
+
+                <!-- Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="تبديل الوضع">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        
+        <!-- Statistics Section -->
+        <section class="bg-white dark:bg-navy-900 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 card-shadow transition-colors">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                
+                <!-- Stat 1: Total Progress -->
+                <div class="bg-slate-50 dark:bg-navy-950/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80 flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">التقدم الإجمالي</span>
+                        <div class="text-xl font-extrabold text-slate-900 dark:text-slate-100" id="progressPercent">0%</div>
+                    </div>
+                </div>
+
+                <!-- Stat 2: Chapters Read -->
+                <div class="bg-slate-50 dark:bg-navy-950/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80 flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium font-sans">الإصحاحات المكتملة</span>
+                        <div class="text-xl font-extrabold text-slate-900 dark:text-slate-100">
+                            <span id="completedChapters">0</span> / <span id="totalChaptersCount">929</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat 3: Total Days -->
+                <div class="bg-slate-50 dark:bg-navy-950/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80 flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">الأيام الإجمالية</span>
+                        <div class="text-xl font-extrabold text-slate-900 dark:text-slate-100">
+                            <span id="completedDays">0</span> / <span id="totalDaysCount">465</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stat 4: Streak -->
+                <div class="bg-slate-50 dark:bg-navy-950/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80 flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">المواظبة المستمرة</span>
+                        <div class="text-xl font-extrabold text-slate-900 dark:text-slate-100"><span id="streakCount">0</span> يوم</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <span>نسبة الإنجاز الخطي</span>
+                    <span id="progressBarText">0 من 929 إصحاح</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3.5 overflow-hidden p-0.5">
+                    <div id="progressBarFill" class="gold-gradient h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Jump Toolbar & Controls -->
+        <section class="bg-white dark:bg-navy-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 card-shadow space-y-4">
+            
+            <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+                
+                <!-- Search Box -->
+                <div class="relative flex-grow max-w-md">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="بحث باسم السفر، رقم اليوم، أو الملاحظات..." class="w-full pr-10 pl-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-navy-950 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <!-- Book Dropdown & Direct Jump -->
+                <div class="flex flex-wrap items-center gap-2">
+                    
+                    <select id="quickBookSelect" onchange="jumpToBook()" class="px-3 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-navy-950 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">-- اختر السفر للانتقال --</option>
+                    </select>
+
+                    <div class="flex items-center space-x-1 space-x-reverse">
+                        <input type="number" id="jumpDayInput" placeholder="رقم اليوم" min="1" class="w-20 px-3 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-navy-950 text-slate-800 dark:text-slate-100 text-center focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <button onclick="jumpToDayInput()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition">
+                            انتقل
+                        </button>
+                    </div>
+
+                    <button onclick="scrollToCurrentActiveDay()" class="px-3.5 py-2.5 gold-gradient text-white rounded-xl text-xs font-bold transition shadow-sm hover:opacity-95 flex items-center space-x-1.5 space-x-reverse">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <span>اليوم الحالي</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Status & View Options -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                
+                <!-- Status Filter Pills -->
+                <div class="flex flex-wrap gap-1.5">
+                    <button onclick="setStatusFilter('ALL')" id="filterBtnALL" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-white transition">الكل</button>
+                    <button onclick="setStatusFilter('UNCOMPLETED')" id="filterBtnUNCOMPLETED" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 transition">غير المكتملة</button>
+                    <button onclick="setStatusFilter('COMPLETED')" id="filterBtnCOMPLETED" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 transition">المكتملة</button>
+                    <button onclick="setStatusFilter('NOTES')" id="filterBtnNOTES" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 transition">بها ملاحظات</button>
+                </div>
+
+                <!-- Jump Grid Toggle & View Toggle -->
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <button onclick="toggleGridCollapse()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-table-cells text-amber-500 ml-1"></i>
+                        <span id="gridToggleText">إخفاء شبكة الأيام</span>
+                    </button>
+
+                    <button onclick="setViewMode('DETAILS')" id="viewBtnDETAILS" class="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100" title="عرض تفصيلي">
+                        <i class="fa-solid fa-list-ul text-xs"></i>
+                    </button>
+                    <button onclick="setViewMode('GRID')" id="viewBtnGRID" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" title="عرض مربعات مضغوطة">
+                        <i class="fa-solid fa-grip-vertical text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Day Range Selector -->
+            <div id="quickRangesContainer" class="flex flex-wrap gap-1.5 pt-2">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Jump Grid Container -->
+            <div id="jumpGridContainer" class="p-3 bg-slate-50 dark:bg-navy-950/60 rounded-2xl border border-slate-200/60 dark:border-slate-800 max-h-48 overflow-y-auto">
+                <div id="jumpGrid" class="grid grid-cols-8 sm:grid-cols-12 md:grid-cols-16 lg:grid-cols-20 gap-1.5">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Days Reading List -->
+        <section id="daysContainer" class="space-y-4">
+            <!-- Days rendered dynamically -->
+        </section>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white dark:bg-navy-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+            <i class="fa-solid fa-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
+            <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">لا توجد أيام مطابقة لمعايير البحث والتصفية المختارة</p>
+        </div>
+    </main>
+
+    <!-- Notes Modal -->
+    <div id="notesModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white dark:bg-navy-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center space-x-2 space-x-reverse">
+                    <i class="fa-solid fa-note-sticky text-amber-500"></i>
+                    <span id="notesModalTitle">ملاحظات اليوم</span>
+                </h3>
+                <button onclick="closeNotesModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <textarea id="notesTextarea" rows="6" placeholder="اكتب تأملاتك أو ملاحظاتك الخاصة بهذا اليوم هنا..." class="w-full p-3 text-xs sm:text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-navy-950 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"></textarea>
+
+            <div class="flex justify-end space-x-2 space-x-reverse">
+                <button onclick="closeNotesModal()" class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">إلغاء</button>
+                <button onclick="saveNoteFromModal()" class="px-5 py-2 gold-gradient text-white text-xs font-bold rounded-xl shadow-md transition hover:opacity-95">حفظ الملاحظة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-2 space-x-reverse text-xs font-bold transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-amber-400 dark:text-amber-600 text-base"></i>
+        <span id="toastMessage">تم الحفظ بنجاح</span>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           BIBLE BOOKS DATA STRUCTURE (39 Standard + 7 Deuterocanonical)
+           ========================================================================== */
+        const standardBooks = [
+            { name: "التكوين", chapters: 50, summary: "سفر البدايات: الخليقة، السقوط، الطوفان، وإبراهيم وإسحاق ويعقوب ويوسف." },
+            { name: "الخروج", chapters: 40, summary: "خروج شعب إسرائيل من مصر، عبور البحر الأحمر، الوصايا العشر، وبناء خيمة الاجتماع." },
+            { name: "اللاويين", chapters: 27, summary: "شرائع الذبائح والكهنوت، الأعياد المقدسة والقداسة في الحياة اليومية." },
+            { name: "العدد", chapters: 36, summary: "إحصاء الشعب ورحلة الـ 40 سنة في البرية حتى التخوم الأخيرة لأرض الموعد." },
+            { name: "التثنية", chapters: 34, summary: "خطاب موسى الوداعي: مراجعة الشريعة، والعهد، وإعداد الجيل الجديد للدخول." },
+            { name: "يشوع", chapters: 24, summary: "عبور الأردن، فتح أرض كنعان وتقسيمها على الأسباط وصية يشوع الأخيرة." },
+            { name: "القضاة", chapters: 21, summary: "عصر القضاة والدورة المكررة: السقوط، العبودية، الصراخ، والإخلاص بالإيمان." },
+            { name: "راعوث", chapters: 4, summary: "قصة المحبة والأمانة في زمن القضاة، ونسب داود الملك والسيد المسيح." },
+            { name: "صموئيل الأول", chapters: 31, summary: "تأسيس المملكة: صموئيل النبي، شاول الملك، وااختيار ومسح داود." },
+            { name: "صموئيل الثاني", chapters: 24, summary: "ملك داود ونموه، نجاحاته وتوبته ونمو المملكة وتوحيدها." },
+            { name: "ملوك أول", chapters: 22, summary: "حكمة وسفر سليمان، بناء الهيكل، انقسام المملكة إلى شمالية وجنوبية، وإيليا النبي." },
+            { name: "ملوك ثاني", chapters: 25, summary: "تاريخ المملكتين حتى السقوط: سبى السامرة ثم سبى بابل وهدم الهيكل." },
+            { name: "أخبار الأيام الأول", chapters: 29, summary: "الأنساب الإلهية، تنظيم خدمة داود للملك وتنظيم العبادة في الهيكل." },
+            { name: "أخبار الأيام الثاني", chapters: 36, summary: "ملوك يهوذا، إحياء العبادة في الهيكل، الإصلاحات والانتهاء بالسبي." },
+            { name: "عزرا", chapters: 10, summary: "الرجوع من السبي البابلي، إعادة بناء الهيكل وتجديد العهد مع الله." },
+            { name: "نحميا", chapters: 13, summary: "إعادة بناء أسوار أورشليم والتنظيم الروحي والاجتماعي للشعب." },
+            { name: "أستير", chapters: 10, summary: "عناية الله وحفظه العجيب لشعبه في أرض الفارسية عن طريق الملكة أستير ومردخاي." },
+            { name: "أيوب", chapters: 42, summary: "مشكلة الألم، صمود الإيمان، والحكمة الإلهية المتسامية." },
+            { name: "المزامير", chapters: 150, summary: "كتاب الصلوات والتسابيح والنبوءات المسكونية والروحية." },
+            { name: "الأمثال", chapters: 31, summary: "حكمة الحياة اليومية، مخافة الرب، والتوجيهات للأخلاق والسلوك." },
+            { name: "الجامعة", chapters: 12, summary: "بطلان الأباطيل الدنيوية بدون الله والنتيجة الكبرى: اتّقِ الله واحفظ وصاياه." },
+            { name: "نشيد الأنشاد", chapters: 8, summary: "نشيد الحب الإلهي والتعبير الرمزي العميق عن المحبة بين الله والنفس." },
+            { name: "إشعياء", chapters: 66, summary: "أمير الأنبياء: نبوات واضحة جداً عن تجسد وآلام ومجد السيد المسيح." },
+            { name: "إرميا", chapters: 52, summary: "النبي الباكي: الدعوة للعودة لله، النبوة بالسبي والعهد الجديد." },
+            { name: "مراثي إرميا", chapters: 5, summary: "قصائد الحزن والأسى على خراب أورشليم مع الرجاء في مراحم الله الجديدة كل صباح." },
+            { name: "حزقيال", chapters: 48, summary: "رؤى المجد الإلهي، هيكل العهد الجديد، ورجاء العظام اليابسة." },
+            { name: "دانيال", chapters: 12, summary: "الأمانة في أرض البابليين، رؤى الممالك الأربع والمسيح ابن الإنسان." },
+            { name: "هوشع", chapters: 14, summary: "محبة الله الغافرة وغير المشروطة لشعبه رغم زناهم الروحي." },
+            { name: "يوئيل", chapters: 3, summary: "سكوب الروح القدس ويوم الرب العظيم وزمن التوبة." },
+            { name: "عاموس", chapters: 9, summary: "العدالة الإجتماعية، رفض العبادة الشكلية والنداء بالتوبة." },
+            { name: "عوبديا", chapters: 1, summary: "دينونة الكبرياء والدينونة على أدوم ونصرة ملكوت الرب." },
+            { name: "يونان", chapters: 4, summary: "محبة الله الشاملة لكل الشعوب وتوبة نينوى وقصة الثلاثة أيام." },
+            { name: "ميخا", chapters: 7, summary: "النداء بالعدل والمحبة والمشي بالتواضع ومولد المسيح في بيت لحم." },
+            { name: "ناحوم", chapters: 3, summary: "دينونة نينوى وسقوط الظلم والفرج لشعب الله." },
+            { name: "حبقوق", chapters: 3, summary: "البار بإيمانه يحيى: التساؤل عن الغلبة والجواب الإلهي بتمجيد اسم الله." },
+            { name: "صفنيا", chapters: 3, summary: "يوم غضب الرب والتنقية والوعد بالبقية الصالحة والمترنحة." },
+            { name: "حجي", chapters: 2, summary: "التحفيز لإعادة بناء هيكل الرب وإعطاء الأولوية للبيت الإلهي." },
+            { name: "زكريا", chapters: 14, summary: "رؤى مسيانية كثيرة: دخول أورشليم، الثلاثين من الفضة، والملك الآتي." },
+            { name: "ملاخي", chapters: 4, summary: "آخر أنبياء العهد القديم: الأمانة في العشور والدعوة لإعداد الطريق لمجيء إيليا والرب." }
+        ];
+
+        const deuterocanonicalBooks = [
+            { name: "طوبيا", chapters: 14, summary: "التقوى الأسرية، العمل الصالح، وإرشاد الملاك رافائيل." },
+            { name: "يهوديت", chapters: 16, summary: "الشجاعة والصوم والإيمان الشديد الذي أنقذ الشعب من أليفانا." },
+            { name: "الحكمة", chapters: 19, summary: "عظمة الحكمة الإلهية، خلود النفس، ومقارنة الصديق بالأشرار." },
+            { name: "يشوع بن سيراخ", chapters: 51, summary: "تعاليم حكيمة شاملة في السلوك والأخلاق والتعاملات والتقوى." },
+            { name: "باروخ", chapters: 6, summary: "صلوات التوبة في السبي، الحكمة الحقيقية والنبوة بالظهور على الأرض." },
+            { name: "المكابيين الأول", chapters: 16, summary: "تاريخ جهاد المكابيين دفاعاً عن الإيمان وتطهير الهيكل (عيد التجديد)." },
+            { name: "المكابيين الثاني", chapters: 15, summary: "استشهاد الأخوة السبعة وأمهم، قيامة الأبرار والصلوات عن الراقدين." }
+        ];
+
+        let state = {
+            includeDeutero: true,
+            statusFilter: 'ALL',
+            viewMode: 'DETAILS',
+            completedChapters: {},
+            dayNotes: {},
+            darkMode: false,
+            gridCollapsed: false,
+            activeRange: 'ALL'
+        };
+
+        let generatedDays = [];
+        let currentModalDay = null;
+
+        window.onload = function() {
+            loadSavedData();
+            applyTheme();
+            rebuildPlan();
+            populateQuickBookSelect();
+            renderQuickRangeButtons();
+            renderQuickJumpGrid();
+            renderDays();
+            updateStats();
+            updateDeuteroUI();
+        };
+
+        function loadSavedData() {
+            const savedState = localStorage.getItem('ot_bible_tracker_v3');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    state = { ...state, ...parsed };
+                } catch(e) {
+                    console.error("Error loading state", e);
+                }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('ot_bible_tracker_v3', JSON.stringify(state));
+            updateStats();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function rebuildPlan() {
+            const booksList = state.includeDeutero 
+                ? [...standardBooks, ...deuterocanonicalBooks] 
+                : standardBooks;
+
+            const allChapters = [];
+            booksList.forEach(b => {
+                for (let c = 1; c <= b.chapters; c++) {
+                    allChapters.push({
+                        book: b.name,
+                        chapter: c,
+                        summary: b.summary
+                    });
+                }
+            });
+
+            generatedDays = [];
+            let dayNum = 1;
+            for (let i = 0; i < allChapters.length; i += 2) {
+                const ch1 = allChapters[i];
+                const ch2 = allChapters[i + 1] || null;
+
+                generatedDays.push({
+                    dayNumber: dayNum,
+                    chapters: ch2 ? [ch1, ch2] : [ch1]
+                });
+                dayNum++;
+            }
+        }
+
+        function toggleChapter(book, chapter) {
+            const key = book + '-' + chapter;
+            if (state.completedChapters[key]) {
+                delete state.completedChapters[key];
+            } else {
+                state.completedChapters[key] = true;
+            }
+            saveData();
+            renderQuickJumpGrid();
+            renderDays();
+        }
+
+        function toggleAllChaptersOfDay(dayNum, markAsComplete) {
+            const dayObj = generatedDays.find(d => d.dayNumber === dayNum);
+            if (!dayObj) return;
+
+            dayObj.chapters.forEach(ch => {
+                const key = ch.book + '-' + ch.chapter;
+                if (markAsComplete) {
+                    state.completedChapters[key] = true;
+                } else {
+                    delete state.completedChapters[key];
+                }
+            });
+
+            saveData();
+            renderQuickJumpGrid();
+            renderDays();
+            showToast(markAsComplete ? 'تم إكمال اليوم ' + dayNum : 'تم إلغاء تحديد اليوم ' + dayNum);
+        }
+
+        function updateStats() {
+            const booksList = state.includeDeutero 
+                ? [...standardBooks, ...deuterocanonicalBooks] 
+                : standardBooks;
+
+            const totalChapters = booksList.reduce((acc, b) => acc + b.chapters, 0);
+            const totalDays = generatedDays.length;
+
+            let completedCount = 0;
+            booksList.forEach(b => {
+                for (let c = 1; c <= b.chapters; c++) {
+                    if (state.completedChapters[b.name + '-' + c]) {
+                        completedCount++;
+                    }
+                }
+            });
+
+            const percent = totalChapters > 0 ? Math.round((completedCount / totalChapters) * 100) : 0;
+
+            let daysCompleted = 0;
+            let streak = 0;
+            let currentStreakActive = true;
+
+            for (let i = 0; i < generatedDays.length; i++) {
+                const d = generatedDays[i];
+                const isComplete = d.chapters.every(ch => state.completedChapters[ch.book + '-' + ch.chapter]);
+                if (isComplete) {
+                    daysCompleted++;
+                }
+            }
+
+            for (let i = 0; i < generatedDays.length; i++) {
+                const d = generatedDays[i];
+                const isComplete = d.chapters.every(ch => state.completedChapters[ch.book + '-' + ch.chapter]);
+                if (isComplete && currentStreakActive) {
+                    streak++;
+                } else {
+                    currentStreakActive = false;
+                }
+            }
+
+            document.getElementById('totalChaptersCount').textContent = totalChapters;
+            document.getElementById('completedChapters').textContent = completedCount;
+            document.getElementById('totalDaysCount').textContent = totalDays;
+            document.getElementById('completedDays').textContent = daysCompleted;
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressBarFill').style.width = percent + '%';
+            document.getElementById('progressBarText').textContent = completedCount + ' من ' + totalChapters + ' إصحاح';
+            document.getElementById('streakCount').textContent = streak;
+        }
+
+        function populateQuickBookSelect() {
+            const select = document.getElementById('quickBookSelect');
+            select.innerHTML = '<option value="">-- اختر السفر للانتقال --</option>';
+
+            const booksList = state.includeDeutero 
+                ? [...standardBooks, ...deuterocanonicalBooks] 
+                : standardBooks;
+
+            booksList.forEach(b => {
+                const firstDay = generatedDays.find(d => d.chapters.some(ch => ch.book === b.name));
+                const dayNum = firstDay ? firstDay.dayNumber : 1;
+                const option = document.createElement('option');
+                option.value = dayNum;
+                option.textContent = b.name + ' (اليوم ' + dayNum + ')';
+                select.appendChild(option);
+            });
+        }
+
+        function renderQuickRangeButtons() {
+            const container = document.getElementById('quickRangesContainer');
+            container.innerHTML = '';
+
+            const totalDays = generatedDays.length;
+            const step = 50;
+            
+            const allBtn = document.createElement('button');
+            allBtn.className = 'px-2.5 py-1 text-xs rounded-lg border font-semibold transition ' + 
+                (state.activeRange === 'ALL' ? 'bg-amber-500 text-white border-amber-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100');
+            allBtn.textContent = 'عرض الجميع';
+            allBtn.onclick = function() { setRangeFilter('ALL'); };
+            container.appendChild(allBtn);
+
+            for (let start = 1; start <= totalDays; start += step) {
+                const end = Math.min(start + step - 1, totalDays);
+                const rangeKey = start + '-' + end;
+                const btn = document.createElement('button');
+                btn.className = 'px-2 py-1 text-xs rounded-lg border font-semibold transition ' + 
+                    (state.activeRange === rangeKey ? 'bg-amber-500 text-white border-amber-500' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100');
+                btn.textContent = start + ' - ' + end;
+                btn.onclick = function() { setRangeFilter(rangeKey); };
+                container.appendChild(btn);
+            }
+        }
+
+        function setRangeFilter(rangeKey) {
+            state.activeRange = rangeKey;
+            renderQuickRangeButtons();
+            renderDays();
+        }
+
+        function renderQuickJumpGrid() {
+            const grid = document.getElementById('jumpGrid');
+            grid.innerHTML = '';
+
+            generatedDays.forEach(d => {
+                const isComplete = d.chapters.every(ch => state.completedChapters[ch.book + '-' + ch.chapter]);
+                const isPartial = d.chapters.some(ch => state.completedChapters[ch.book + '-' + ch.chapter]) && !isComplete;
+                const hasNote = !!state.dayNotes[d.dayNumber];
+
+                let bgClass = 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+                if (isComplete) {
+                    bgClass = 'bg-emerald-500 text-white';
+                } else if (isPartial) {
+                    bgClass = 'bg-amber-500 text-white';
+                } else if (hasNote) {
+                    bgClass = 'bg-blue-500 text-white';
+                }
+
+                const item = document.createElement('button');
+                item.className = bgClass + ' text-[11px] font-bold h-7 rounded-lg flex items-center justify-center transition transform hover:scale-105 shadow-sm relative';
+                item.textContent = d.dayNumber;
+                item.title = 'اليوم ' + d.dayNumber + ': ' + d.chapters.map(c => c.book + ' ' + c.chapter).join('، ');
+                item.onclick = function() {
+                    const el = document.getElementById('day-card-' + d.dayNumber);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('ring-2', 'ring-amber-500');
+                        setTimeout(() => el.classList.remove('ring-2', 'ring-amber-500'), 2000);
+                    }
+                };
+                grid.appendChild(item);
+            });
+        }
+
+        function renderDays() {
+            const container = document.getElementById('daysContainer');
+            const emptyState = document.getElementById('emptyState');
+            container.innerHTML = '';
+
+            const searchTerm = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+
+            let filtered = generatedDays.filter(d => {
+                const isComplete = d.chapters.every(ch => state.completedChapters[ch.book + '-' + ch.chapter]);
+                const hasNote = !!state.dayNotes[d.dayNumber];
+
+                // Status Filter
+                if (state.statusFilter === 'COMPLETED' && !isComplete) return false;
+                if (state.statusFilter === 'UNCOMPLETED' && isComplete) return false;
+                if (state.statusFilter === 'NOTES' && !hasNote) return false;
+
+                // Range Filter
+                if (state.activeRange !== 'ALL') {
+                    const [start, end] = state.activeRange.split('-').map(Number);
+                    if (d.dayNumber < start || d.dayNumber > end) return false;
+                }
+
+                // Search Filter
+                if (searchTerm) {
+                    const matchDayNum = d.dayNumber.toString() === searchTerm;
+                    const matchBook = d.chapters.some(ch => ch.book.toLowerCase().includes(searchTerm));
+                    const matchNote = hasNote && state.dayNotes[d.dayNumber].toLowerCase().includes(searchTerm);
+                    return matchDayNum || matchBook || matchNote;
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            if (state.viewMode === 'GRID') {
+                container.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
+            } else {
+                container.className = 'space-y-4';
+            }
+
+            filtered.forEach(d => {
+                const isComplete = d.chapters.every(ch => state.completedChapters[ch.book + '-' + ch.chapter]);
+                const noteText = state.dayNotes[d.dayNumber] || '';
+
+                const card = document.createElement('div');
+                card.id = 'day-card-' + d.dayNumber;
+                card.className = 'bg-white dark:bg-navy-900 rounded-3xl p-5 border ' + 
+                    (isComplete ? 'border-emerald-500/40 dark:border-emerald-500/30' : 'border-slate-200/80 dark:border-slate-800') + 
+                    ' card-shadow transition-all duration-200 space-y-4';
+
+                // Card Header
+                const headerHtml = `
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center space-x-2.5 space-x-reverse">
+                            <span class="w-8 h-8 rounded-xl ${isComplete ? 'bg-emerald-500 text-white' : 'bg-amber-500/10 text-amber-500 dark:bg-amber-500/20'} flex items-center justify-center font-black text-xs">
+                                ${d.dayNumber}
+                            </span>
+                            <span class="font-bold text-sm text-slate-800 dark:text-slate-100">اليوم ${d.dayNumber}</span>
+                        </div>
+                        <div class="flex items-center space-x-2 space-x-reverse">
+                            <button onclick="openNotesModal(${d.dayNumber})" class="p-2 rounded-xl text-xs font-semibold ${noteText ? 'bg-blue-500/10 text-blue-500' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'} transition flex items-center space-x-1 space-x-reverse" title="الملاحظات">
+                                <i class="fa-solid fa-note-sticky"></i>
+                                <span class="text-[11px]">${noteText ? 'تعديل النوت' : 'إضافة نوت'}</span>
+                            </button>
+                            <button onclick="toggleAllChaptersOfDay(${d.dayNumber}, ${!isComplete})" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${isComplete ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'}">
+                                ${isComplete ? '<i class="fa-solid fa-check ml-1"></i> مكتمل' : 'تحديد اليوم'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Chapters List
+                let chaptersHtml = '<div class="grid grid-cols-1 ' + (d.chapters.length > 1 && state.viewMode === 'DETAILS' ? 'md:grid-cols-2' : '') + ' gap-3">';
+                d.chapters.forEach(ch => {
+                    const chKey = ch.book + '-' + ch.chapter;
+                    const chChecked = !!state.completedChapters[chKey];
+
+                    chaptersHtml += `
+                        <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-navy-950/60 border border-slate-100 dark:border-slate-800/80 space-y-2 flex flex-col justify-between">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-slate-900 dark:text-slate-100">${ch.book} - الإصحاح ${ch.chapter}</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">${ch.summary}</p>
+                                </div>
+                                <input type="checkbox" ${chChecked ? 'checked' : ''} onchange="toggleChapter('${ch.book}', ${ch.chapter})" class="w-5 h-5 mt-0.5 rounded-md text-amber-500 focus:ring-amber-500 dark:bg-slate-800 border-slate-300 dark:border-slate-700 cursor-pointer accent-amber-500 shrink-0">
+                            </div>
+                        </div>
+                    `;
+                });
+                chaptersHtml += '</div>';
+
+                // Note Preview if exists
+                let notePreviewHtml = '';
+                if (noteText) {
+                    notePreviewHtml = `
+                        <div class="p-3 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 text-xs text-slate-700 dark:text-slate-300 flex items-start space-x-2 space-x-reverse">
+                            <i class="fa-solid fa-quote-right text-blue-400 mt-0.5 shrink-0"></i>
+                            <p class="whitespace-pre-wrap">${escapeHtml(noteText)}</p>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = headerHtml + chaptersHtml + notePreviewHtml;
+                container.appendChild(card);
+            });
+        }
+
+        function openNotesModal(dayNum) {
+            currentModalDay = dayNum;
+            const modal = document.getElementById('notesModal');
+            const title = document.getElementById('notesModalTitle');
+            const textarea = document.getElementById('notesTextarea');
+
+            title.textContent = 'ملاحظات وتأملات - اليوم ' + dayNum;
+            textarea.value = state.dayNotes[dayNum] || '';
+
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeNotesModal() {
+            const modal = document.getElementById('notesModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentModalDay = null;
+            }, 200);
+        }
+
+        function saveNoteFromModal() {
+            if (currentModalDay === null) return;
+            const val = document.getElementById('notesTextarea').value.trim();
+
+            if (val) {
+                state.dayNotes[currentModalDay] = val;
+            } else {
+                delete state.dayNotes[currentModalDay];
+            }
+
+            saveData();
+            closeNotesModal();
+            renderQuickJumpGrid();
+            renderDays();
+            showToast('تم حفظ الملاحظة بنجاح');
+        }
+
+        function toggleDeuterocanonical() {
+            state.includeDeutero = !state.includeDeutero;
+            updateDeuteroUI();
+            rebuildPlan();
+            populateQuickBookSelect();
+            renderQuickRangeButtons();
+            renderQuickJumpGrid();
+            renderDays();
+            saveData();
+            showToast(state.includeDeutero ? 'تم تفعيل الأسفار القانونية الثانية' : 'تم استبعاد الأسفار القانونية الثانية');
+        }
+
+        function updateDeuteroUI() {
+            const text = document.getElementById('deuteroStatusText');
+            if (text) {
+                text.textContent = state.includeDeutero ? 'الأسفار الثانية: مفعّلة' : 'الأسفار الثانية: غير مفعّلة';
+            }
+        }
+
+        function toggleDarkMode() {
+            state.darkMode = !state.darkMode;
+            applyTheme();
+            saveData();
+        }
+
+        function applyTheme() {
+            if (state.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function setStatusFilter(filter) {
+            state.statusFilter = filter;
+            ['ALL', 'UNCOMPLETED', 'COMPLETED', 'NOTES'].forEach(f => {
+                const btn = document.getElementById('filterBtn' + f);
+                if (btn) {
+                    if (f === filter) {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-white transition';
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 transition';
+                    }
+                }
+            });
+            renderDays();
+        }
+
+        function setViewMode(mode) {
+            state.viewMode = mode;
+            const btnDetails = document.getElementById('viewBtnDETAILS');
+            const btnGrid = document.getElementById('viewBtnGRID');
+            
+            if (mode === 'DETAILS') {
+                btnDetails.className = 'p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100';
+                btnGrid.className = 'p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800';
+            } else {
+                btnGrid.className = 'p-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100';
+                btnDetails.className = 'p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800';
+            }
+            renderDays();
+        }
+
+        function toggleGridCollapse() {
+            const gridContainer = document.getElementById('jumpGridContainer');
+            const text = document.getElementById('gridToggleText');
+            state.gridCollapsed = !state.gridCollapsed;
+            if (state.gridCollapsed) {
+                gridContainer.classList.add('hidden');
+                text.textContent = 'إظهار شبكة الأيام';
+            } else {
+                gridContainer.classList.remove('hidden');
+                text.textContent = 'إخفاء شبكة الأيام';
+            }
+            saveData();
+        }
+
+        function handleSearch() {
+            renderDays();
+        }
+
+        function jumpToBook() {
+            const dayNum = document.getElementById('quickBookSelect').value;
+            if (dayNum) {
+                jumpToDayNumber(parseInt(dayNum, 10));
+            }
+        }
+
+        function jumpToDayInput() {
+            const val = document.getElementById('jumpDayInput').value;
+            if (val) {
+                jumpToDayNumber(parseInt(val, 10));
+            }
+        }
+
+        function jumpToDayNumber(dayNum) {
+            state.activeRange = 'ALL';
+            renderQuickRangeButtons();
+            renderDays();
+
+            setTimeout(() => {
+                const el = document.getElementById('day-card-' + dayNum);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('ring-2', 'ring-amber-500');
+                    setTimeout(() => el.classList.remove('ring-2', 'ring-amber-500'), 2000);
+                } else {
+                    showToast('اليوم غير موجود أو مستبعد بسبب الفلاتر');
+                }
+            }, 100);
+        }
+
+        function scrollToCurrentActiveDay() {
+            const activeDay = generatedDays.find(d => !d.chapters.every(ch => state.completedChapters[ch.book + '-' + ch.chapter]));
+            if (activeDay) {
+                jumpToDayNumber(activeDay.dayNumber);
+            } else {
+                showToast('مبروك! لقد أتممت قراءة الخطة بالكامل!');
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `bible_reading_plan_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dlAnchorElem);
+            dlAnchorElem.click();
+            dlAnchorElem.remove();
+            showToast('تم تصدير النسخة الاحتياطية');
+        }
+
+        function triggerImport() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    if (importedState && typeof importedState === 'object') {
+                        state = { ...state, ...importedState };
+                        saveData();
+                        applyTheme();
+                        rebuildPlan();
+                        populateQuickBookSelect();
+                        renderQuickRangeButtons();
+                        renderQuickJumpGrid();
+                        renderDays();
+                        updateStats();
+                        updateDeuteroUI();
+                        showToast('تم استيراد البيانات بنجاح');
+                    }
+                } catch(err) {
+                    showToast('ملف غير صالح');
+                }
+            };
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0]);
+            }
+        }
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
